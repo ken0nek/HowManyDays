@@ -8,42 +8,45 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+final class ViewController: UIViewController {
 
-
-    @IBOutlet weak var dateTextField: UITextField!
+    @IBOutlet private weak var dateTextField: UITextField!
     
-    @IBOutlet weak var daysLabel: UILabel!
+    @IBOutlet private weak var daysLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
     
         let datePicker = UIDatePicker()
-        datePicker.addTarget(self, action: #selector(ViewController.didChangeDate(_:)), forControlEvents: UIControlEvents.ValueChanged)
-        datePicker.datePickerMode = UIDatePickerMode.Date
+        datePicker.addTarget(self, action: #selector(ViewController.didChangeDate(_:)), for: .valueChanged)
+        datePicker.datePickerMode = .date
         dateTextField.inputView = datePicker
         
-        let toolBar = UIToolbar(frame: CGRectMake(0, 0, view.frame.size.width, 40.0))
+        let toolBar = UIToolbar(frame: CGRect(origin: .zero, size: CGSize(width: view.frame.size.width, height: 40)))
         
-        let doneButton = UIBarButtonItem(barButtonSystemItem: .Done, target: self, action: #selector(ViewController.done))
+        let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(ViewController.done))
         toolBar.items = [doneButton]
         
         dateTextField.inputAccessoryView = toolBar
     }
     
-    func didChangeDate(picker: UIDatePicker) {
-        let df = NSDateFormatter()
+    func didChangeDate(_ picker: UIDatePicker) {
+        let df = DateFormatter()
         df.dateFormat = "yyyy年MM月dd日"
-        let date = df.stringFromDate(picker.date)
+        let date = df.string(from: picker.date)
         dateTextField.text = date
         
-        let calendar = NSCalendar(identifier: NSCalendarIdentifierGregorian)!
-        let now = NSDate()
-        
-        let componentsByDay = calendar.components([.Day], fromDate: now, toDate: picker.date, options: [])
-        
-        daysLabel.text = "あと\(componentsByDay.day)日"
+        let calendar = Calendar(identifier: Calendar.Identifier.gregorian)
+        let now = Date()
+
+        let componentsByDay = calendar.dateComponents([.day], from: now, to: picker.date)
+
+        guard let day = componentsByDay.day else {
+            return
+        }
+
+        daysLabel.text = "あと\(day + 1)日"
     }
     
     func done() {
@@ -55,6 +58,4 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
-
 }
-
